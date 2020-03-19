@@ -16,7 +16,7 @@ extends:
     enableLinuxGCCBuilds: true
     # Common build settings
     conanArchs: "x86_64"
-    #conanBuildTypes: "Release"
+    conanBuildTypes: "Release"
     conanStableBranchPattern: "stable/*"
     #conanOptions: "qwt:shared=False" # Build only the shared libraries
     conanSharedOptionName: "False" # Disable automatic build combination generation
