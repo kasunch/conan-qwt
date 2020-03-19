@@ -96,6 +96,7 @@ class QwtConan(ConanFile):
                                     " ".join(build_args)))
 
     def _build_msvc(self, args = ""):
+        qmake_command = os.path.join(self.deps_cpp_info['qt'].rootpath, "bin", "qmake")
         build_command = find_executable("jom.exe")
         if build_command:
             build_args = ["-j", str(cpu_count())]
@@ -109,7 +110,7 @@ class QwtConan(ConanFile):
 
         with tools.environment_append(env_build.vars):
             vcvars = tools.vcvars_command(self.settings)
-            self.run("cd %s && %s && qmake -r qwt.pro" % (self.source_folder, vcvars))
+            self.run("cd %s && %s && %s -r qwt.pro" % (self.source_folder, vcvars, qmake_command))
             self.run("cd %s && %s && %s %s" % (self.source_folder, 
                                                 vcvars, 
                                                 build_command, 
