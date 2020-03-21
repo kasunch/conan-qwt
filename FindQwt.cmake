@@ -2,34 +2,34 @@
 # available at http://qwt.sourceforge.net/
 #
 # The module defines the following variables:
-#  QWT_FOUND - the system has Qwt
-#  QWT_INCLUDE_DIR - where to find qwt_plot.h
-#  QWT_INCLUDE_DIRS - qwt includes
-#  QWT_QWT_LIBRARY - where to find the Qwt library
-#  QWT_MATHML_LIBRARY - where to find Mathml library
-#  QWT_LIBRARIES - aditional libraries
-#  QWT_MAJOR_VERSION - major version
-#  QWT_MINOR_VERSION - minor version
-#  QWT_PATCH_VERSION - patch version
-#  QWT_VERSION_STRING - version (ex. 5.2.1)
-#  QWT_ROOT_DIR - root directory of Qwt installation
+#  Qwt_FOUND - the system has Qwt
+#  Qwt_INCLUDE_DIR - where to find qwt_plot.h
+#  Qwt_INCLUDE_DIRS - qwt includes
+#  Qwt_Qwt_LIBRARY - where to find the Qwt library
+#  Qwt_Mathml_LIBRARY - where to find Mathml library
+#  Qwt_LIBRARIES - aditional libraries
+#  Qwt_MAJOR_VERSION - major version
+#  Qwt_MINOR_VERSION - minor version
+#  Qwt_PATCH_VERSION - patch version
+#  Qwt_VERSION_STRING - version (ex. 5.2.1)
+#  Qwt_ROOT_DIR - root directory of Qwt installation
 
-set(QWT_ROOT_DIR ${CONAN_QWT_ROOT})
+set(Qwt_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-find_path(QWT_INCLUDE_DIR NAMES qwt_plot.h PATHS ${CONAN_INCLUDE_DIRS_QWT})
+find_path(Qwt_INCLUDE_DIR NAMES qwt_plot.h PATHS "${CMAKE_CURRENT_LIST_DIR}/include")
 
-set(QWT_INCLUDE_DIRS ${QWT_INCLUDE_DIR})
+set(Qwt_INCLUDE_DIRS ${Qwt_INCLUDE_DIR})
 
 #-------------------------------- Extract version --------------------------------------------------
 
-set(_VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h)
+set(_VERSION_FILE ${Qwt_INCLUDE_DIR}/qwt_global.h)
 if(EXISTS ${_VERSION_FILE})
     file(STRINGS ${_VERSION_FILE} _VERSION_LINE REGEX "define[ ]+QWT_VERSION_STR")
     if(_VERSION_LINE)
         string (REGEX REPLACE ".*define[ ]+QWT_VERSION_STR[ ]+\"(.*)\".*" "\\1" QWT_VERSION_STRING "${_VERSION_LINE}")
-        string (REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\1" QWT_MAJOR_VERSION "${QWT_VERSION_STRING}")
-        string (REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\2" QWT_MINOR_VERSION "${QWT_VERSION_STRING}")
-        string (REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\3" QWT_PATCH_VERSION "${QWT_VERSION_STRING}")
+        string (REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\1" Qwt_MAJOR_VERSION "${QWT_VERSION_STRING}")
+        string (REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\2" Qwt_MINOR_VERSION "${QWT_VERSION_STRING}")
+        string (REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\3" Qwt_PATCH_VERSION "${QWT_VERSION_STRING}")
     endif()
 endif()
 
@@ -50,19 +50,21 @@ endif()
 
 #-------------------------------- Find library files -----------------------------------------------
 
-find_library(QWT_QWT_LIBRARY 
+find_library(Qwt_Qwt_LIBRARY 
   NAMES qwt 
-  PATHS ${CONAN_LIB_DIRS_QWT}
+  PATHS "${CMAKE_CURRENT_LIST_DIR}"
   PATH_SUFFIXES lib
+  NO_DEFAULT_PATH
 )
 
-find_library(QWT_MATHML_LIBRARY 
+find_library(Qwt_Mathml_LIBRARY 
   NAMES qwtmathml 
-  PATHS ${CONAN_LIB_DIRS_QWT}
+  PATHS "${CMAKE_CURRENT_LIST_DIR}"
   PATH_SUFFIXES lib
+  NO_DEFAULT_PATH
 )
 
-set(QWT_LIBRARIES ${QWT_QWT_LIBRARY} ${QWT_MATHML_LIBRARY})
+set(Qwt_LIBRARIES ${Qwt_Qwt_LIBRARY} ${Qwt_Mathml_LIBRARY})
 
 #-------------------------------- Set component status ---------------------------------------------
 
@@ -74,18 +76,17 @@ endif()
 set(_qwt_component_required_vars)
 
 foreach(_comp ${Qwt_FIND_COMPONENTS})
-
     if ("${_comp}" STREQUAL "Qwt")
-        list(APPEND _qwt_component_required_vars ${QWT_QWT_LIBRARY})
-        if (QWT_INCLUDE_DIR AND EXISTS "${QWT_QWT_LIBRARY}")
+        list(APPEND _qwt_component_required_vars ${Qwt_Qwt_LIBRARY})
+        if (Qwt_INCLUDE_DIR AND EXISTS "${Qwt_Qwt_LIBRARY}")
             set(Qwt_Qwt_FOUND TRUE)
         else()
             set(Qwt_Qwt_FOUND False)
         endif()
         
     elseif("${_comp}" STREQUAL "Mathml")
-        list(APPEND _qwt_component_required_vars ${QWT_MATHML_LIBRARY})
-        if (QWT_INCLUDE_DIR AND EXISTS "${QWT_QWT_LIBRARY}" AND EXISTS "${QWT_MATHML_LIBRARY}")
+        list(APPEND _qwt_component_required_vars ${Qwt_Mathml_LIBRARY})
+        if (Qwt_INCLUDE_DIR AND EXISTS "${Qwt_Qwt_LIBRARY}" AND EXISTS "${Qwt_Mathml_LIBRARY}")
             set(Qwt_Mathml_FOUND TRUE)
         else()
             set(Qwt_Mathml_FOUND False)
@@ -108,18 +109,25 @@ find_package_handle_standard_args(Qwt
 
 #-------------------------------- Export found libraries as imported targets -----------------------
 
+set(_interface_link_libraries "Qt5::Core;Qt5::Concurrent;Qt5::PrintSupport;Qt5::OpenGL")
+list(APPEND _interface_link_libraries "Qt5::Svg")
+
 if(Qwt_Qwt_FOUND AND NOT TARGET Qwt::Qwt)
-    add_library(Qwt::Qwt INTERFACE IMPORTED)
+    add_library(Qwt::Qwt STATIC IMPORTED)
     set_target_properties(Qwt::Qwt PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${QWT_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${QWT_QWT_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${Qwt_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${_interface_link_libraries}"
+        IMPORTED_LOCATION "${Qwt_Qwt_LIBRARY}"
     )
+    
 endif()
 
 if(Qwt_Mathml_FOUND AND NOT TARGET Qwt::Mathml)
-    add_library(Qwt::Mathml INTERFACE IMPORTED)
+    list(TRANSFORM _interface_link_libraries PREPEND "${Qwt_Qwt_LIBRARY}")
+    add_library(Qwt::Mathml STATIC IMPORTED)
     set_target_properties(Qwt::Qwt PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${QWT_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${QWT_QWT_LIBRARY} ${QWT_MATHML_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${Qwt_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${_interface_link_libraries}"
+        IMPORTED_LOCATION "${Qwt_Mathml_LIBRARY}"
     )
 endif()

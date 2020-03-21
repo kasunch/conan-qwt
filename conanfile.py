@@ -118,12 +118,26 @@ class QwtConan(ConanFile):
 
     def package(self):
         self.copy("FindQwt.cmake", ".", ".")
+        self._fix_find_qwt(os.path.join(self.package_folder, "FindQwt.cmake"))
         self.copy("*.h", dst="include", src=os.path.join(self.source_folder, "src"), excludes="moc")
         self.copy("*qwt.lib", dst="lib", keep_path=False)
         self.copy("*.dll", dst="lib", keep_path=False)
         self.copy("*.so", dst="lib", keep_path=False)
         self.copy("*.dylib", dst="lib", keep_path=False)
         self.copy("*.a", dst="lib", keep_path=False)
+
+    def _fix_find_qwt(self, filename):
+        if not self.options.svg:
+            tools.replace_in_file(filename, 
+                                    'list(APPEND _interface_link_libraries "Qt5::Svg")\n', 
+                                    '')
+        if self.options.shared:
+            tools.replace_in_file(filename, 
+                                    'add_library(Qwt::Qwt STATIC IMPORTED)', 
+                                    'add_library(Qwt::Qwt SHARED IMPORTED)')
+            tools.replace_in_file(filename, 
+                                    'add_library(Qwt::Mathml STATIC IMPORTED)', 
+                                    'add_library(Qwt::Mathml SHARED IMPORTED)')
 
     def package_info(self):
         self.cpp_info.libs = ["qwt"]

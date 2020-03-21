@@ -19,12 +19,12 @@ extends:
     conanBuildTypes: "Release"
     conanStableBranchPattern: "stable/*"
     #conanOptions: "qwt:shared=False" # Build only the shared libraries
-    conanSharedOptionName: "False" # Disable automatic build combination generation
+    #conanSharedOptionName: "False" # Disable automatic build combination generation
     # GCC specific
     linuxGCCVersions: "7"
     # Visual Studio specific
     vsVersions: "16"
-    conanVsRuntimes: "MD,MDd"
+    conanVsRuntimes: "MD"
     # Apple clang specific
     appleClangVersions: "10"
     # CI specific settings
