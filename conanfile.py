@@ -129,7 +129,7 @@ class QwtConan(ConanFile):
     def _fix_find_qwt(self, filename):
         if not self.options.svg:
             tools.replace_in_file(filename, 
-                                    'list(APPEND _interface_link_libraries "Qt5::Svg")\n', 
+                                    'list(APPEND Qwt_LIBRARIES "Qt5::Svg")\n', 
                                     '')
         if self.options.shared:
             tools.replace_in_file(filename, 

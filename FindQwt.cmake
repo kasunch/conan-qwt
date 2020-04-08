@@ -7,7 +7,7 @@
 #  Qwt_INCLUDE_DIRS - qwt includes
 #  Qwt_Qwt_LIBRARY - where to find the Qwt library
 #  Qwt_Mathml_LIBRARY - where to find Mathml library
-#  Qwt_LIBRARIES - aditional libraries
+#  Qwt_LIBRARIES - aditional libraries need to be linked
 #  Qwt_MAJOR_VERSION - major version
 #  Qwt_MINOR_VERSION - minor version
 #  Qwt_PATCH_VERSION - patch version
@@ -64,8 +64,6 @@ find_library(Qwt_Mathml_LIBRARY
   NO_DEFAULT_PATH
 )
 
-set(Qwt_LIBRARIES ${Qwt_Qwt_LIBRARY} ${Qwt_Mathml_LIBRARY})
-
 #-------------------------------- Set component status ---------------------------------------------
 
 if(NOT "${Qwt_FIND_COMPONENTS}")
@@ -109,25 +107,24 @@ find_package_handle_standard_args(Qwt
 
 #-------------------------------- Export found libraries as imported targets -----------------------
 
-set(_interface_link_libraries "Qt5::Core;Qt5::Concurrent;Qt5::PrintSupport;Qt5::OpenGL")
-list(APPEND _interface_link_libraries "Qt5::Svg")
+set(Qwt_LIBRARIES "Qt5::Core;Qt5::Concurrent;Qt5::PrintSupport;Qt5::OpenGL")
+list(APPEND Qwt_LIBRARIES "Qt5::Svg")
 
 if(Qwt_Qwt_FOUND AND NOT TARGET Qwt::Qwt)
     add_library(Qwt::Qwt STATIC IMPORTED)
     set_target_properties(Qwt::Qwt PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${Qwt_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${_interface_link_libraries}"
+        INTERFACE_LINK_LIBRARIES "${Qwt_LIBRARIES}"
         IMPORTED_LOCATION "${Qwt_Qwt_LIBRARY}"
     )
     
 endif()
 
 if(Qwt_Mathml_FOUND AND NOT TARGET Qwt::Mathml)
-    list(TRANSFORM _interface_link_libraries PREPEND "${Qwt_Qwt_LIBRARY}")
     add_library(Qwt::Mathml STATIC IMPORTED)
     set_target_properties(Qwt::Qwt PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${Qwt_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${_interface_link_libraries}"
+        INTERFACE_LINK_LIBRARIES "${Qwt_Qwt_LIBRARY};${Qwt_LIBRARIES}"
         IMPORTED_LOCATION "${Qwt_Mathml_LIBRARY}"
     )
 endif()
