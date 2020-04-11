@@ -42,7 +42,7 @@ class QwtConan(ConanFile):
         svn.checkout(**self.conan_data["sources"][self.version])
 
     def requirements(self):
-        self.requires("qt/5.14.1@bincrafters/stable")
+        self.requires("qt/5.14.1@bincreators/stable")
 
         if self.options.svg:
             self.options["qt"].qtsvg = True
