@@ -21,7 +21,7 @@ extends:
     #conanOptions: "qwt:shared=False" # Build only the shared libraries
     #conanSharedOptionName: "False" # Disable automatic build combination generation
     # GCC specific
-    linuxGCCVersions: "7"
+    linuxGCCVersions: "5,7"
     # Visual Studio specific
     vsVersions: "16"
     conanVsRuntimes: "MD"
